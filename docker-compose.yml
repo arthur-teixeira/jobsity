@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  api:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+      - DB_NAME=jobsity
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4200:4200"
+
+  db:
+    image: postgres:latest
+    restart: always
+    tty: true
+    volumes:
+      - .pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=jobsity
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    tty: true
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@user.com
+      - PGADMIN_DEFAULT_PASSWORD=123456
+    ports:
+      - "9000:80"
+    depends_on:
+      - db

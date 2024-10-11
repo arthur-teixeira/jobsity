@@ -1,0 +1,25 @@
+<div class="task" *ngIf="!isEditing; else elseBlock">
+  <div class="taskValues">
+    <input id="isCompleted" type="checkbox" [checked]="task.isCompleted" (click)="onComplete($event)">
+    <p [ngClass]="{isCompleted: task.isCompleted}">{{ task.title }}</p>
+  </div>
+
+  <div class="options">
+    <button class="btnEdit" (click)="isEditing = true"><fa-icon [icon]="faPenToSquare" size="lg" /></button>
+    <button class="btnDelete" (click)="onDelete()"><fa-icon [icon]="faTrash" size="lg" /></button>
+  </div>
+</div>
+
+<ng-template #elseBlock>
+  <form [formGroup]="taskForm" class="task">
+    <div class="todoValues">
+      <input id="isCompleted" formControlName="isCompleted" type="checkbox" [checked]="task.isCompleted" />
+      <input id="title" type="text" formControlName="title" />
+    </div>
+
+    <div class="options">
+      <button class="btnSave" (click)="onEdit()" [disabled]="!taskForm.valid"><fa-icon [icon]="faSave"
+          size="lg" /></button>
+    </div>
+  </form>
+</ng-template>

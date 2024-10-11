@@ -1,0 +1,68 @@
+.task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  width: 100%;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--lightgray);
+}
+
+.completed {
+  text-decoration: line-through;
+}
+
+.taskValues {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.taskValues #name {
+  border: none;
+  padding: none;
+  border-bottom: 1px solid var(--lightgray);
+}
+
+.taskValues #name.ng-invalid {
+  border-bottom: 1px solid var(--red);
+}
+
+.taskValues>p,
+.taskValues>input#name {
+  width: 80%;
+}
+
+.taskValues>p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.options>button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btnEdit,
+.btnSave {
+  color: var(--blue);
+}
+
+.btnSave:disabled {
+  color: var(--lightgray);
+  cursor: not-allowed !important;
+}
+
+.btnDelete {
+  color: var(--red);
+}
