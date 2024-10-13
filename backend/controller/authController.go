@@ -61,9 +61,17 @@ func (controller AuthController) CreateUser(w http.ResponseWriter, r *http.Reque
 		log.Println("Error saving user to database: ", err)
 		errorResponse(w, errors.New("Error creating user"), http.StatusInternalServerError)
 		return
-	}
+	} 
 
-	okCreated(w)
+  token, err:= service.CreateJWTToken(user.Name, user.Email)
+  if err != nil {
+    errorResponse(w, errors.New("An unexpected error occurred"), http.StatusInternalServerError)
+    return
+  }
+
+  res := AuthResponse { token }
+	response, _ := json.Marshal(res)
+	okResponse(w, response)
 }
 
 func (controller AuthController) SignIn(w http.ResponseWriter, r *http.Request) {

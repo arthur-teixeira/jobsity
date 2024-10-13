@@ -28,8 +28,7 @@ func (controller TaskController) GetTasks(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	searchTerm := r.URL.Query().Get("search")
-	tasks, err := controller.tasksRepository.GetTasks(searchTerm)
+	tasks, err := controller.tasksRepository.GetTasksByUser(user)
 	if err != nil {
 		errorResponse(w, err, http.StatusInternalServerError)
 		return
@@ -46,7 +45,7 @@ func (controller TaskController) editTask(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	numAffected, err := controller.tasksRepository.UpdateTask(body.Id, body.Title, body.IsCompleted)
+	numAffected, err := controller.tasksRepository.UpdateTask(body.Id, body.Title, body.IsCompleted, user)
 	if err != nil {
 		errorResponse(w, err, http.StatusInternalServerError)
 		return
@@ -68,7 +67,7 @@ func (controller TaskController) deleteTask(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	numAffected, err := controller.tasksRepository.DeleteTask(taskId)
+	numAffected, err := controller.tasksRepository.DeleteTask(taskId, user)
 	if err != nil {
 		errorResponse(w, err, http.StatusInternalServerError)
 		return
@@ -89,7 +88,7 @@ func (controller TaskController) createTask(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	newTask, err := controller.tasksRepository.CreateTask(body.Title)
+	newTask, err := controller.tasksRepository.CreateTask(body.Title, user)
 	if err != nil {
 		errorResponse(w, err, http.StatusInternalServerError)
 		return
