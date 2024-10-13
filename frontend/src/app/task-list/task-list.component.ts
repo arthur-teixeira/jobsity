@@ -5,6 +5,7 @@ import { Subscription, catchError, of } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TaskComponent } from '../task/task.component';
+import { Router } from '@angular/router';
 
 const filters = [
   "All",
@@ -27,6 +28,7 @@ type Filter = typeof filters[number];
 })
 export class TaskListComponent {
   private taskService = inject(TaskService);
+  private router = inject(Router);
 
   private tasks: Task[] = [];
 
@@ -47,7 +49,10 @@ export class TaskListComponent {
   ngOnInit() {
     const tasksSub = this.taskService
       .getTasks()
-      .pipe(catchError(() => {
+      .pipe(catchError(e => {
+        if (e.status === 401) {
+          this.router.navigate(['login']);
+        }
         this.hasError = true;
         return of(null);
       }))

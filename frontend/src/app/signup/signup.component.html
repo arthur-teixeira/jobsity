@@ -1,0 +1,11 @@
+<section class="main">
+  <header>
+    <h1>Sign up</h1>
+  </header>
+  <form [formGroup]="signupForm" class="loginForm">
+    <input type="text" formControlName="email" placeholder="Email" class="taskInput" />
+    <input type="password" formControlName="password" placeholder="Password" class="taskInput" />
+    <p>Already have an account? <span class="redirect" (click)="goToLogin()">Login here</span></p>
+    <button (click)="signUp()" [disabled]="!signupForm.valid">Sign up</button>
+  </form>
+</section>

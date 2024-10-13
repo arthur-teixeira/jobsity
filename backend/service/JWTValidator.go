@@ -1,15 +1,16 @@
 package service
 
 import (
-	"github.com/golang-jwt/jwt"
+	"os"
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
-var SECRET = []byte("VERY_SECRET_SECRET")
+var SECRET = []byte(os.Getenv("JWT_SECRET"))
 
-func CreateJWTToken(name, email string) (string, error) {
+func CreateJWTToken(email string) (string, error) {
 	claims := jwt.MapClaims{
-		"name":  name,
 		"email": email,
 		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}

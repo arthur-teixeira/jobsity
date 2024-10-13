@@ -25,13 +25,20 @@ func NewAuthController(db *sql.DB, saltLen, keyLen uint32, userRepo *repository.
 }
 
 func (controller AuthController) CreateUser(w http.ResponseWriter, r *http.Request) {
-  enableCors(&w)
+	enableCors(&w)
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Methods", ", POST, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	body, err := validators.ValidateCreateUserRequest(r)
+	body, err := validators.ValidateAuthRequest(r)
 	if err != nil {
 		errorResponse(w, err, http.StatusBadRequest)
 		return
@@ -56,32 +63,38 @@ func (controller AuthController) CreateUser(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = controller.userRepo.CreateUser(body.Name, body.Email, hashSalt)
+	err = controller.userRepo.CreateUser(body.Email, hashSalt)
 	if err != nil {
 		log.Println("Error saving user to database: ", err)
 		errorResponse(w, errors.New("Error creating user"), http.StatusInternalServerError)
 		return
-	} 
+	}
 
-  token, err:= service.CreateJWTToken(user.Name, user.Email)
-  if err != nil {
-    errorResponse(w, errors.New("An unexpected error occurred"), http.StatusInternalServerError)
-    return
-  }
+	token, err := service.CreateJWTToken(body.Email)
+	if err != nil {
+		errorResponse(w, errors.New("An unexpected error occurred"), http.StatusInternalServerError)
+		return
+	}
 
-  res := AuthResponse { token }
+	res := AuthResponse{token}
 	response, _ := json.Marshal(res)
 	okResponse(w, response)
 }
 
 func (controller AuthController) SignIn(w http.ResponseWriter, r *http.Request) {
   enableCors(&w)
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Methods", ", POST, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
-	body, err := validators.ValidateSignInRequest(r)
+	body, err := validators.ValidateAuthRequest(r)
 	if err != nil {
 		errorResponse(w, err, http.StatusBadRequest)
 		return
@@ -90,7 +103,7 @@ func (controller AuthController) SignIn(w http.ResponseWriter, r *http.Request) 
 	user, err := controller.userRepo.GetUserByEmail(body.Email)
 	if err != nil {
 		log.Println("Error getting user data from database: ", err)
-    errorResponse(w, errors.New("An unexpected error occurred"), http.StatusInternalServerError)
+		errorResponse(w, errors.New("An unexpected error occurred"), http.StatusInternalServerError)
 		return
 	}
 
@@ -105,13 +118,13 @@ func (controller AuthController) SignIn(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-  token, err:= service.CreateJWTToken(user.Name, user.Email)
-  if err != nil {
-    errorResponse(w, errors.New("An unexpected error occurred"), http.StatusInternalServerError)
-    return
-  }
+	token, err := service.CreateJWTToken(user.Email)
+	if err != nil {
+		errorResponse(w, errors.New("An unexpected error occurred"), http.StatusInternalServerError)
+		return
+	}
 
-  res := AuthResponse { token }
+	res := AuthResponse{token}
 	response, _ := json.Marshal(res)
 	okResponse(w, response)
 }

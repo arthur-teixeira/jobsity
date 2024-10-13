@@ -22,7 +22,7 @@ func NewTaskController(db *sql.DB) *TaskController {
 }
 
 func (controller TaskController) GetTasks(w http.ResponseWriter, r *http.Request, user *entitites.User) {
-	enableCors(&w)
+  enableCors(&w)
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -99,8 +99,7 @@ func (controller TaskController) createTask(w http.ResponseWriter, r *http.Reque
 }
 
 func (controller TaskController) HandleTask(w http.ResponseWriter, r *http.Request, user *entitites.User) {
-	enableCors(&w)
-
+  enableCors(&w)
 	switch r.Method {
 	case http.MethodPost:
 		controller.createTask(w, r, user)
@@ -108,11 +107,6 @@ func (controller TaskController) HandleTask(w http.ResponseWriter, r *http.Reque
 		controller.editTask(w, r, user)
 	case http.MethodDelete:
 		controller.deleteTask(w, r, user)
-	case http.MethodOptions:
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.WriteHeader(http.StatusOK)
-		return
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return

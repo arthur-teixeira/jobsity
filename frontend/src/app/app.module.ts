@@ -5,6 +5,8 @@ import { TaskComponent } from './task/task.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
+import { RouterModule } from '@angular/router';
+import { routes } from './app.routes';
 
 @NgModule({
   declarations: [],
@@ -15,7 +17,7 @@ import { AppComponent } from './app.component';
     TaskListComponent,
     CommonModule,
     AppComponent,
-    TaskComponent
+    TaskComponent,
   ],
   exports: [
     AppComponent,

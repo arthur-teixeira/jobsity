@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"jobsity-backend/entitites"
 	"jobsity-backend/repository"
 	"jobsity-backend/service"
@@ -15,6 +14,14 @@ type SecuredHttpHandler func(w http.ResponseWriter, r *http.Request, user *entit
 
 func AuthMiddleware(userRepo *repository.UserRepository, next SecuredHttpHandler) HttpHandler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers", "*")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -28,23 +35,22 @@ func AuthMiddleware(userRepo *repository.UserRepository, next SecuredHttpHandler
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
-    if !ok {
+		if !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
-    }
+		}
 
-    email, ok := claims["email"].(string)
-    if !ok {
+		email, ok := claims["email"].(string)
+		if !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
-    }
+		}
 
-    fmt.Println(email)
-    user, err := userRepo.GetUserByEmail(email)
-    if err != nil {
-      w.WriteHeader(http.StatusUnauthorized)
-      return
-    }
+		user, err := userRepo.GetUserByEmail(email)
+		if err != nil || user == nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 
 		next(w, r, user)
 	}

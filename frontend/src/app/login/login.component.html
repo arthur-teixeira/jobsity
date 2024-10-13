@@ -1,0 +1,15 @@
+<section class="main">
+  <div *ngIf="hasError" class="error">
+    <p>{{errorMessage}}</p>
+  </div>
+
+  <header>
+    <h1>Log in</h1>
+  </header>
+  <form [formGroup]="loginForm" class="loginForm">
+    <input type="email" formControlName="email" placeholder="Email" class="taskInput" />
+    <input type="password" formControlName="password" placeholder="Password" class="taskInput" />
+    <p>Don't have an account yet? <span class="redirect" (click)="goToSignup()">Sign up here</span></p>
+    <button (click)="logIn()" [disabled]="!loginForm.valid">Login</button>
+  </form>
+</section>

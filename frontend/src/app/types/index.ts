@@ -7,3 +7,7 @@ export type Task = {
 export type TaskRequest = {
   title: string
 };
+
+export type AuthResponse = {
+  token: string
+}
