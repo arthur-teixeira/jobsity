@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"jobsity-backend/entitites"
 	"jobsity-backend/repository"
 	"jobsity-backend/validators"
 	"net/http"
@@ -20,7 +21,7 @@ func NewTaskController(db *sql.DB) *TaskController {
 	}
 }
 
-func (controller TaskController) GetTasks(w http.ResponseWriter, r *http.Request) {
+func (controller TaskController) GetTasks(w http.ResponseWriter, r *http.Request, user *entitites.User) {
 	enableCors(&w)
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -38,7 +39,7 @@ func (controller TaskController) GetTasks(w http.ResponseWriter, r *http.Request
 	okResponse(w, response)
 }
 
-func (controller TaskController) editTask(w http.ResponseWriter, r *http.Request) {
+func (controller TaskController) editTask(w http.ResponseWriter, r *http.Request, user *entitites.User) {
 	body, err := validators.ValidateEditTaskRequest(r)
 	if err != nil {
 		errorResponse(w, err, http.StatusBadRequest)
@@ -60,7 +61,7 @@ func (controller TaskController) editTask(w http.ResponseWriter, r *http.Request
 	okResponse(w, response)
 }
 
-func (controller TaskController) deleteTask(w http.ResponseWriter, r *http.Request) {
+func (controller TaskController) deleteTask(w http.ResponseWriter, r *http.Request, user *entitites.User) {
 	taskId, err := validators.ValidateDeleteTaskRequest(r)
 	if err != nil {
 		errorResponse(w, err, http.StatusBadRequest)
@@ -81,7 +82,7 @@ func (controller TaskController) deleteTask(w http.ResponseWriter, r *http.Reque
 	noContent(w)
 }
 
-func (controller TaskController) createTask(w http.ResponseWriter, r *http.Request) {
+func (controller TaskController) createTask(w http.ResponseWriter, r *http.Request, user *entitites.User) {
 	body, err := validators.ValidateCreateTaskRequest(r)
 	if err != nil {
 		errorResponse(w, err, http.StatusBadRequest)
@@ -98,16 +99,16 @@ func (controller TaskController) createTask(w http.ResponseWriter, r *http.Reque
 	okResponse(w, response)
 }
 
-func (controller TaskController) HandleTask(w http.ResponseWriter, r *http.Request) {
+func (controller TaskController) HandleTask(w http.ResponseWriter, r *http.Request, user *entitites.User) {
 	enableCors(&w)
 
 	switch r.Method {
 	case http.MethodPost:
-		controller.createTask(w, r)
+		controller.createTask(w, r, user)
 	case http.MethodPut:
-		controller.editTask(w, r)
+		controller.editTask(w, r, user)
 	case http.MethodDelete:
-		controller.deleteTask(w, r)
+		controller.deleteTask(w, r, user)
 	case http.MethodOptions:
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")

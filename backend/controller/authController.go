@@ -2,6 +2,7 @@ package controller
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"jobsity-backend/repository"
 	"jobsity-backend/service"
@@ -15,10 +16,8 @@ type AuthController struct {
 	userRepo      *repository.UserRepository
 }
 
-func NewAuthController(db *sql.DB, saltLen, keyLen uint32) *AuthController {
+func NewAuthController(db *sql.DB, saltLen, keyLen uint32, userRepo *repository.UserRepository) *AuthController {
 	hasher := service.NewHasher(saltLen, keyLen)
-	userRepo := repository.NewUserRepository(db)
-
 	return &AuthController{
 		hasher,
 		userRepo,
@@ -83,7 +82,7 @@ func (controller AuthController) SignIn(w http.ResponseWriter, r *http.Request) 
 	user, err := controller.userRepo.GetUserByEmail(body.Email)
 	if err != nil {
 		log.Println("Error getting user data from database: ", err)
-		errorResponse(w, errors.New("Unexpected error"), http.StatusInternalServerError)
+    errorResponse(w, errors.New("An unexpected error occurred"), http.StatusInternalServerError)
 		return
 	}
 
@@ -98,5 +97,13 @@ func (controller AuthController) SignIn(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	noContent(w)
+  token, err:= service.CreateJWTToken(user.Name, user.Email)
+  if err != nil {
+    errorResponse(w, errors.New("An unexpected error occurred"), http.StatusInternalServerError)
+    return
+  }
+
+  res := AuthResponse { token }
+	response, _ := json.Marshal(res)
+	okResponse(w, response)
 }

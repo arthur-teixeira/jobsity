@@ -1,8 +1,8 @@
 package service
 
 import (
-	"time"
 	"github.com/golang-jwt/jwt"
+	"time"
 )
 
 var SECRET = []byte("VERY_SECRET_SECRET")
@@ -24,14 +24,14 @@ func CreateJWTToken(name, email string) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateToken(tokenString string) bool {
+func ValidateToken(tokenString string) *jwt.Token {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return SECRET, nil
 	})
 
 	if err != nil {
-		return false
+		return nil
 	}
 
-	return token.Valid
+	return token
 }
